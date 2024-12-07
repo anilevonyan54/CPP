@@ -24,3 +24,21 @@ int main() {
 
 	return 0;
 }
+
+
+
+//tarb 2
+#include <iostream>
+using namespace std;
+
+class Singleton {
+private:
+	static Singleton* instance;
+	Singleton(){}
+
+public:
+	static Singleton* getInstance() {
+		return instance;
+	}
+};
+Singleton* Singleton::instance = new Singleton();
