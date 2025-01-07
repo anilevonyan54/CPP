@@ -1,137 +1,47 @@
 #include <iostream>
 #include <string>
+#include <forward_list>
+
 using namespace std;
-
-// Ավտոմեքենայի օբյեկտը, որը պետք է կառուցվի
-class Car {
+class Observer {
 private:
-    string engine;
-    string body;
-    string wheels;
-    string color;
-
+	string mName;
 public:
-    void setEngine(const string& e) { engine = e; }
-    void setBody(const string& b) { body = b; }
-    void setWheels(const string& w) { wheels = w; }
-    void setColor(const string& c) { color = c; }
-
-    void showCar() {
-        cout << "Car with " << engine << " engine, " << body << " body, " 
-             << wheels << " wheels, and " << color << " color." << endl;
-    }
+	Observer(string name) {
+		mName = name;
+	}
+	void OnNotify() {
+		cout << mName << " says hello." << endl;
+	}
 };
 
-// Builder Interface
-class CarBuilder {
+class Subject {
 public:
-    virtual void buildEngine() = 0;
-    virtual void buildBody() = 0;
-    virtual void buildWheels() = 0;
-    virtual void buildColor() = 0;
-    virtual Car* getCar() = 0;
-};
-
-// Կոնկրետ Builder 1
-class SportsCarBuilder : public CarBuilder {
+void AddObserver(Observer* observer) {
+	mObservers.push_front(observer);
+	}
+void RemoveObserver(Observer* observer) {
+	mObservers.remove(observer);
+}
+void NotifyAll() {
+	for (auto& o : mObservers) {
+		o->OnNotify();
+	}
+}
 private:
-    Car* car;
-
-public:
-    SportsCarBuilder() { car = new Car(); }
-
-    void buildEngine() override {
-        car->setEngine("V8");
-    }
-
-    void buildBody() override {
-        car->setBody("Sports body");
-    }
-
-    void buildWheels() override {
-        car->setWheels("Alloy wheels");
-    }
-
-    void buildColor() override {
-        car->setColor("Red");
-    }
-
-    Car* getCar() override {
-        return car;
-    }
-};
-
-// Կոնկրետ Builder 2
-class FamilyCarBuilder : public CarBuilder {
-private:
-    Car* car;
-
-public:
-    FamilyCarBuilder() { car = new Car(); }
-
-    void buildEngine() override {
-        car->setEngine("V6");
-    }
-
-    void buildBody() override {
-        car->setBody("Family body");
-    }
-
-    void buildWheels() override {
-        car->setWheels("Standard wheels");
-    }
-
-    void buildColor() override {
-        car->setColor("Blue");
-    }
-
-    Car* getCar() override {
-        return car;
-    }
-};
-
-// Director class (գործադիր)
-class Director {
-private:
-    CarBuilder* builder;
-
-public:
-    Director(CarBuilder* b) : builder(b) {}
-
-    void constructCar() {
-        builder->buildEngine();
-        builder->buildBody();
-        builder->buildWheels();
-        builder->buildColor();
-    }
-
-    Car* getCar() {
-        return builder->getCar();
-    }
+	forward_list<Observer*> mObservers;
 };
 
 int main() {
-    // Կոնկրետ կառուցողներ
-    SportsCarBuilder sportsCarBuilder;
-    FamilyCarBuilder familyCarBuilder;
+	Subject subject;
+	Observer observer1("observer - 1");
+	Observer observer2("observer - 2");
+	Observer observer3("observer - 3");
 
-    // Դիրեկտոր (գործադիր)
-    Director sportsCarDirector(&sportsCarBuilder);
-    Director familyCarDirector(&familyCarBuilder);
+	subject.AddObserver(&observer1);
+	subject.AddObserver(&observer2);
+	subject.AddObserver(&observer3);
+	subject.NotifyAll();
 
-    // Կառուցել ավտոմեքենաներ
-    sportsCarDirector.constructCar();
-    familyCarDirector.constructCar();
-
-    // Ցուցադրել ավտոմեքենաների տվյալները
-    Car* sportsCar = sportsCarDirector.getCar();
-    Car* familyCar = familyCarDirector.getCar();
-
-    sportsCar->showCar();
-    familyCar->showCar();
-
-    delete sportsCar;
-    delete familyCar;
-
-    return 0;
+	return 0;
 }
